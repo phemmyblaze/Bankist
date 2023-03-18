@@ -58,6 +58,8 @@
 // const eurToUsd = 1.1;
 
 
+
+
 // const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 // const movementsusd = movements.map(function(mov) {
@@ -70,53 +72,71 @@
 // );
 // console.log(movements)
 // console.log(movementusd)
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-const deposits = movements.filter(function(mov) {
+// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+// const deposits = movements.filter(function(mov) {
   
-  return mov > 0
-})
-console.log(deposits)
+//   return mov > 0
+// })
+// console.log(deposits)
 
 
-const despositsfor = [];
-for (const mov of movements) if(mov < 0) despositsfor.push(mov);
-console.log(despositsfor)
 
-const withdraw = movements.filter(function(mov) {
-  return mov < 0;
-})
-console.log(withdraw)
 
-const withdraws = movements.filter(mov => mov < 0)
-console.log(withdraws)
+// const withdraw = movements.filter(function(mov) {
+//   return mov < 0;
+// })
+// console.log(withdraw)
+
+// const withdraws = movements.filter(mov => mov < 0)
+// console.log(withdraws)
 
 // const totals = movements.reduce(function (mov, i) {
 //   // console.log(i)
 //   return mov + i;
  
 // },0 )
-const totals = movements.reduce((mov, i) =>
-   mov + i ,0 )
-console.log(totals)
+// const totals = movements.reduce((mov, i) =>
+//    mov + i ,0 )
+// console.log(totals)
 
-let balance = 0;
-for (const mov of movements) balance += mov; 
-console.log(balance)
+// let balance = 0;
+// for (const mov of movements) balance += mov; 
+// console.log(balance)
 
-const max = movements.reduce((mov, i) => {
-  if (mov < i)
-    return mov
-  else
-    return i
-}, movements[0])
+// const max = movements.reduce((mov, i) => {
+//   if (mov < i)
+//     return mov
+//   else
+//     return i
+// }, movements[0])
 
-console.log(max)
+// console.log(max)
 
-const eurToUsd = 1.1;
-const totalBalance = movements.filter(mov => mov > 0).map(mov => mov * eurToUsd).reduce((acc, mov) => acc + mov, 0);
-console.log(totalBalance)
+// const eurToUsd = 1.1;
+// const totalBalance = movements.filter(mov => mov > 0).map(mov => mov * eurToUsd).reduce((acc, mov) => acc + mov, 0);
+// console.log(totalBalance)
 
 
+// const account = accounts.find(acc => acc.owner === 'Jessica Davis')
+// console.log(account)
+
+
+// const despositsfor = [];
+// for (const mov of movements) if(mov < 0) despositsfor.push(mov);
+// console.log(despositsfor)
+
+// for (const mov of accounts) if(mov.owner === 'Jessica Davis') accountName.push(mov)
+// console.log(mov)
+
+
+// console.log(accountName)
+
+// const accountName = [];
+
+// const account = accounts.filter(function(mov) {
+//   return mov.owner === 'Jessica Davis';
+// })
+// console.log(account)
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -200,7 +220,7 @@ const displayMovements = function(movements) {
 
   });
 }
-displayMovements(account1.movements);
+// displayMovements(account1.movements);
 
 
 ///Calculating balance
@@ -208,7 +228,7 @@ const calcDisplayBalance = function(movements) {
   const balance = movements.reduce((arr, cur) => arr + cur, 0);
  labelBalance.textContent = `${balance}€`;
 }
-calcDisplayBalance(account1.movements)
+// calcDisplayBalance(account1.movements)
 
 
 ///display summary
@@ -227,7 +247,7 @@ const calcDisplaySummary = function (movements) {
   labelSumInterest.textContent = `${interest}£`
   
 }
-calcDisplaySummary(account1.movements)
+// calcDisplaySummary(account1.movements)
 
 ///working with username
 const createUsernames = function(accs) {
@@ -244,8 +264,33 @@ const createUsernames = function(accs) {
 createUsernames(accounts) 
 
 
+////Event handler
+let currentAccount;
+btnLogin.addEventListener('click', (e) => {
+  ///This fix default reload on page 
+  e.preventDefault();
+
+  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value)
+  
+  if(currentAccount?.pin === Number(inputLoginPin.value)) {
+    ////Display UI AND WELCOME MESSAGE
+    labelWelcome.textContent = `Welcome bank, ${currentAccount.owner.split(" ")[0]}`;
+
+    containerApp.style.opacity = 100; 
 
 
+    ///DISPLAY MOVEMENT 
+    displayMovements(currentAccount.movements)
+
+    ////display balance
+    calcDisplayBalance(currentAccount.movements)
+
+    ////display summary
+    calcDisplaySummary(currentAccount.movements)
+  }
+    
+  
+})
 
 
 
