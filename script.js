@@ -245,7 +245,7 @@ const calcDisplaySummary = function (acc) {
   labelSumOut.textContent = `${Math.abs(outgoing)}`
 
   ////Calculating the interest on desposit 
-  const interest = acc.movements.filter(mov => mov > 0).map(deposit => deposit * acc.interestRate/100).filter((int, i, arr) => { console.log(arr); return int >= 1 }).reduce((acc,  int) => acc + int, 0);
+  const interest = acc.movements.filter(mov => mov > 0).map(deposit => deposit * acc.interestRate/100).filter((int, i, arr) => { return int >= 1 }).reduce((acc,  int) => acc + int, 0);
   labelSumInterest.textContent = `${interest}£`
   
 }
@@ -283,7 +283,7 @@ btnLogin.addEventListener('click', (e) => {
   ///This fix default reload on page 
   e.preventDefault();
 
-  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value)
+  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value.toLowerCase())
   
   if(currentAccount?.pin === Number(inputLoginPin.value)) {
     ////Display UI AND WELCOME MESSAGE
@@ -325,8 +325,8 @@ btnTransfer.addEventListener('click', function(e) {
   e.preventDefault();
 
   const amount = Number(inputTransferAmount.value);
-  const receiverAcc = accounts.find(acc => acc.username === inputTransferTo.value);
-  
+  const receiverAcc = accounts.find(acc => acc.username === inputTransferTo.value.toLowerCase());
+
   inputTransferAmount.value = inputTransferTo.value = '';
   inputTransferAmount.blur()
   inputTransferTo.blur()
@@ -345,6 +345,31 @@ btnTransfer.addEventListener('click', function(e) {
 
     
   }
+
+})
+
+///closing account
+let closeAccount ;
+btnClose.addEventListener("click", function(e) {
+  e.preventDefault();
+
+
+  // closeAccount = currentAccount === accounts.username && accounts.pin; 
+  if (inputCloseUsername.value.toLowerCase() === currentAccount.username && Number(inputClosePin.value) === currentAccount.pin) {
+    const index = accounts.findIndex(acc => acc.username === currentAccount.username)
+    // console.log(index)
+
+    ///Delete account
+    accounts.splice(index, 1)
+
+    ////Hide UI
+    containerApp.style.opacity = 0;
+  }
+  inputCloseUsername.value = inputClosePin.value = '';
+  inputCloseUsername.blur()
+  inputClosePin.blur()
+
+  
 
 })
 
