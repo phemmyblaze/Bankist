@@ -295,3 +295,11 @@ h2 {
 .timer {
   font-weight: 600;
 }
+
+.wrong-info {
+  display: none;
+  /* margin-top: 20rem; */
+  font-size: 5rem;
+  color: #e52a5a;
+  text-align: center;
+}

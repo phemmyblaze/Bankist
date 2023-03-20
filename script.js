@@ -187,6 +187,7 @@ const labelTimer = document.querySelector('.timer');
 
 const containerApp = document.querySelector('.app');
 const containerMovements = document.querySelector('.movements');
+const wrong = document.querySelector('.wrong-info');
 
 const btnLogin = document.querySelector('.login__btn');
 const btnTransfer = document.querySelector('.form__btn--transfer');
@@ -224,26 +225,27 @@ const displayMovements = function(movements) {
 
 
 ///Calculating balance
-const calcDisplayBalance = function(movements) {
-  const balance = movements.reduce((arr, cur) => arr + cur, 0);
- labelBalance.textContent = `${balance}€`;
+const calcDisplayBalance = function(acc) {
+  acc.balance = acc.movements.reduce((arr, cur) => arr + cur, 0);
+  
+ labelBalance.textContent = `${acc.balance}€`;
 }
 // calcDisplayBalance(account1.movements)
 
 
 ///display summary
 
-const calcDisplaySummary = function (movements) {
+const calcDisplaySummary = function (acc) {
   ///total income
-  const incomes = movements.filter(mov => mov > 0).reduce((acc, mov) => acc + mov, 0)
+  const incomes = acc.movements.filter(mov => mov > 0).reduce((acc, mov) => acc + mov, 0)
   labelSumIn.textContent = `${incomes}€`
 
   ///Calculated the out going money
-  const outgoing = movements.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0)
+  const outgoing = acc.movements.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0)
   labelSumOut.textContent = `${Math.abs(outgoing)}`
 
   ////Calculating the interest on desposit 
-  const interest = movements.filter(mov => mov > 0).map(deposit => deposit * 1.2/100).filter((int, i, arr) => { console.log(arr); return int >= 1 }).reduce((acc,  int) => acc + int, 0);
+  const interest = acc.movements.filter(mov => mov > 0).map(deposit => deposit * acc.interestRate/100).filter((int, i, arr) => { console.log(arr); return int >= 1 }).reduce((acc,  int) => acc + int, 0);
   labelSumInterest.textContent = `${interest}£`
   
 }
@@ -263,6 +265,17 @@ const createUsernames = function(accs) {
 };
 createUsernames(accounts) 
 
+const updateUI = function(acc) {
+  ///DISPLAY MOVEMENT 
+  displayMovements(acc.movements)
+
+  ////display balance
+  calcDisplayBalance(acc)
+
+  ////display summary
+  calcDisplaySummary(acc)
+};
+
 
 ////Event handler
 let currentAccount;
@@ -274,24 +287,66 @@ btnLogin.addEventListener('click', (e) => {
   
   if(currentAccount?.pin === Number(inputLoginPin.value)) {
     ////Display UI AND WELCOME MESSAGE
-    labelWelcome.textContent = `Welcome bank, ${currentAccount.owner.split(" ")[0]}`;
+    labelWelcome.textContent = `Welcome bank, ${currentAccount.owner.split(" ")}`;
 
     containerApp.style.opacity = 100; 
+    wrong.style.display = 'none';
+
+    //clear input field
+
+    inputLoginUsername.value = inputLoginPin.value = '',
+    inputLoginPin.blur()
+    inputLoginUsername.blur()
 
 
-    ///DISPLAY MOVEMENT 
-    displayMovements(currentAccount.movements)
+    ///DISPLAY ACCOUNT DETAILS (update UI)
+    updateUI(currentAccount)
 
-    ////display balance
-    calcDisplayBalance(currentAccount.movements)
-
-    ////display summary
-    calcDisplaySummary(currentAccount.movements)
-  }
-    
   
+  } else {
+    
+
+    containerApp.style.opacity = 0;
+    labelWelcome.textContent = `Log in to get started`;
+
+    inputLoginUsername.value = inputLoginPin.value = '',
+    inputLoginPin.blur()
+    inputLoginUsername.blur()
+
+    wrong.style.display = 'block';
+    
+  }
+     
 })
 
+///TRANSFER IMPLENTATION
+
+btnTransfer.addEventListener('click', function(e) {
+  e.preventDefault();
+
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(acc => acc.username === inputTransferTo.value);
+  
+  inputTransferAmount.value = inputTransferTo.value = '';
+  inputTransferAmount.blur()
+  inputTransferTo.blur()
+
+  if (amount > 0 &&
+    receiverAcc &&
+     currentAccount.balance >= amount && receiverAcc?.username !== currentAccount.username
+  ) {
+
+    ///doing transfer to another account
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+
+    ///DISPLAY ACCOUNT DETAILS (update UI)
+    updateUI(currentAccount);
+
+    
+  }
+
+})
 
 
 
