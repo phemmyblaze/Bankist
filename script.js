@@ -348,11 +348,25 @@ btnTransfer.addEventListener('click', function(e) {
 
 })
 
-///closing account
-let closeAccount ;
-btnClose.addEventListener("click", function(e) {
+///Loan implementation
+btnLoan.addEventListener('click', function(e) {
   e.preventDefault();
 
+  const amount = Number(inputLoanAmount.value);
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+    //add movements
+
+    currentAccount.movements.push(amount);
+
+    updateUI(currentAccount)
+  }
+  inputLoanAmount.value = '';
+
+})
+
+///closing account
+btnClose.addEventListener("click", function(e) {
+  e.preventDefault();
 
   // closeAccount = currentAccount === accounts.username && accounts.pin; 
   if (inputCloseUsername.value.toLowerCase() === currentAccount.username && Number(inputClosePin.value) === currentAccount.pin) {
@@ -369,10 +383,8 @@ btnClose.addEventListener("click", function(e) {
   inputCloseUsername.blur()
   inputClosePin.blur()
 
-  
-
 })
-
+ 
 
 
 
