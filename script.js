@@ -204,23 +204,27 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 ///display transfer
-const displayMovements = function(movements) {
-  containerMovements.innerHTML = "";
-  movements.forEach(function(mov, i) {
+const displayMovements = function (movements, sort = false) {
+  containerMovements.innerHTML = '';
+
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+
+  movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
     const html = `
       <div class="movements__row">
-        <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+        <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
     
         <div class="movements__value">${mov}€</div>
       </div>
     
     `;
-    containerMovements.insertAdjacentHTML('afterbegin', html)
-
+    containerMovements.insertAdjacentHTML('afterbegin', html);
   });
-}
+};
 // displayMovements(account1.movements);
 
 
@@ -384,6 +388,13 @@ btnClose.addEventListener("click", function(e) {
   inputClosePin.blur()
 
 })
+
+let sorted = false;
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  sorted = !sorted;
+});
  
 
 
