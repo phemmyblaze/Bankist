@@ -242,20 +242,29 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 ///display transfer
-const displayMovements = function (movements, sort = false) {
+const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = '';
 
-  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  const movs = sort ? acc.movements.slice().sort((a, b) => a - b) : acc.movements;
 
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
+
+    const date = new Date(acc.movementsDates[i]);
+    const day = `${date.getDate()}`.padStart(2, 0);
+    const month = `${date.getMonth() + 1}`.padStart(2, 0);
+    const year = date.getFullYear()
+    
+
+    const displayDate = labelDate.textContent = `${day}/${month}/${year}`;
+
 
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-    
+        <div class="movements__date">${displayDate}</div>        
         <div class="movements__value">${mov.toFixed(2)}€</div>
       </div>
     
@@ -314,7 +323,7 @@ createUsernames(accounts);
 
 const updateUI = function (acc) {
   ///DISPLAY MOVEMENT
-  displayMovements(acc.movements);
+  displayMovements(acc);
 
   ////display balance
   calcDisplayBalance(acc);
@@ -325,6 +334,20 @@ const updateUI = function (acc) {
 
 ////Event handler
 let currentAccount;
+// currentAccount =  account1
+// updateUI(currentAccount)
+// containerApp.style.opacity = 100;
+
+const now = new Date()
+
+const day = `${now.getDate()}`.padStart(2, 0);
+const month = `${now.getMonth() + 1}`.padStart(2, 0);
+const year = now.getFullYear()
+const hours = now.getHours()
+const min = `${now.getMinutes()}`.padStart(2, 0)
+
+labelDate.textContent = `${day}/${month}/${year}, ${hours}:${min}`;
+
 btnLogin.addEventListener('click', e => {
   ///This fix default reload on page
   e.preventDefault();
@@ -335,9 +358,7 @@ btnLogin.addEventListener('click', e => {
 
   if (currentAccount?.pin === +inputLoginPin.value) {
     ////Display UI AND WELCOME MESSAGE
-    labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(
-      ' '
-    )}`;
+    labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ,')}`;
 
     containerApp.style.opacity = 100;
     wrong.style.display = 'none';
@@ -431,14 +452,15 @@ btnClose.addEventListener('click', function (e) {
 });
 
 let sorted = false;
-btnSort.addEventListener('click', function (e) {
-  e.preventDefault();
-  displayMovements(currentAccount.movements, !sorted);
-  sorted = !sorted;
-});
+// btnSort.addEventListener('click', function (e) {
+//   e.preventDefault();
+//   displayMovements(currentAccount.movements, !sorted);
+//   sorted = !sorted;
+// });
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
+
 
   
