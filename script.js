@@ -251,19 +251,17 @@ const formatMovementDate = function (date, locale) {
   if (daysPassed === 1) return 'Yesterday';
   if (daysPassed <= 7) return `${daysPassed} days ago`;
   else {
-
     return new Intl.DateTimeFormat(locale).format(date);
   }
 };
 
-
 ////currency
-const formatcur = function(value, locale, currency) {
+const formatcur = function (value, locale, currency) {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
-  }).format(value)
-}
+  }).format(value);
+};
 
 ///display transfer
 const displayMovements = function (acc, sort = false) {
@@ -279,7 +277,7 @@ const displayMovements = function (acc, sort = false) {
     const date = new Date(acc.movementsDates[i]);
     const displayDate = formatMovementDate(date, acc.locale);
 
-    const formatedMov = formatcur(mov, acc.locale, acc.currency)
+    const formatedMov = formatcur(mov, acc.locale, acc.currency);
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${
@@ -297,12 +295,9 @@ const displayMovements = function (acc, sort = false) {
 
 ///Calculating balance
 const calcDisplayBalance = function (acc) {
- 
   acc.balance = acc.movements.reduce((arr, cur) => arr + cur, 0);
 
-
-  labelBalance.textContent = formatcur(acc.balance, acc.locale, acc.currency)
-  ;
+  labelBalance.textContent = formatcur(acc.balance, acc.locale, acc.currency);
 };
 // calcDisplayBalance(account1.movements)
 
@@ -319,7 +314,11 @@ const calcDisplaySummary = function (acc) {
   const outgoing = acc.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = formatcur(Math.abs(outgoing), acc.locale, acc.currency);
+  labelSumOut.textContent = formatcur(
+    Math.abs(outgoing),
+    acc.locale,
+    acc.currency
+  );
 
   ////Calculating the interest on desposit
   const interest = acc.movements
@@ -329,7 +328,7 @@ const calcDisplaySummary = function (acc) {
       return int >= 1;
     })
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = formatcur(interest, acc.locale, acc.currency);;
+  labelSumInterest.textContent = formatcur(interest, acc.locale, acc.currency);
 };
 // calcDisplaySummary(account1.movements)
 
@@ -356,9 +355,44 @@ const updateUI = function (acc) {
   calcDisplaySummary(acc);
 };
 
-////Event handler
-let currentAccount;
+////logout timer
+const startLogOutTimer = function () {
 
+  const tick= function () {
+    const mins = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+    ////in each call, print the remaining time to ui
+    labelTimer.textContent = `${mins}:${sec}`;
+
+ 
+
+    ////when  0 seconds remain log out users
+    if (time === 0) {
+      clearInterval(timer)
+
+      
+      labelWelcome.textContent = `Log in to get started`
+  
+      containerApp.style.opacity = 0;
+
+    }
+
+       ///decrease 1s
+       time--;
+  }
+  //setting time to 5 mins
+
+  let time = 120;
+
+  ///call timer every seconds
+  tick();
+  const timer = setInterval(tick, 1000);
+
+  return timer;
+};
+
+////Event handler
+let currentAccount, timer;
 
 btnLogin.addEventListener('click', e => {
   ///This fix default reload on page
@@ -387,8 +421,11 @@ btnLogin.addEventListener('click', e => {
     };
 
     // const locale = navigator.language;
-    
-    labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, option).format(now)
+
+    labelDate.textContent = new Intl.DateTimeFormat(
+      currentAccount.locale,
+      option
+    ).format(now);
 
     wrong.style.display = 'none';
 
@@ -396,6 +433,10 @@ btnLogin.addEventListener('click', e => {
 
     (inputLoginUsername.value = inputLoginPin.value = ''), inputLoginPin.blur();
     inputLoginUsername.blur();
+
+    if(timer) clearInterval(timer)
+
+    timer = startLogOutTimer();
 
     ///DISPLAY ACCOUNT DETAILS (update UI)
     updateUI(currentAccount);
@@ -440,6 +481,11 @@ btnTransfer.addEventListener('click', function (e) {
 
     ///DISPLAY ACCOUNT DETAILS (update UI)
     updateUI(currentAccount);
+
+
+    ///reset timer
+    clearInterval(timer)
+    timer = startLogOutTimer();
   }
 });
 
@@ -451,13 +497,17 @@ btnLoan.addEventListener('click', function (e) {
 
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
     //add movements
+    setTimeout(function () {
+      currentAccount.movements.push(amount);
 
-    currentAccount.movements.push(amount);
+      ///Add loan date
+      currentAccount.movementsDates.push(new Date().toISOString());
 
-    ///Add loan date
-    currentAccount.movementsDates.push(new Date().toISOString());
-
-    updateUI(currentAccount);
+      updateUI(currentAccount);
+      ///reset timer
+      clearInterval(timer)
+      timer = startLogOutTimer();
+    }, 2500);
   }
   inputLoanAmount.value = '';
 });
@@ -487,7 +537,6 @@ btnClose.addEventListener('click', function (e) {
   inputClosePin.blur();
 });
 
-
 ////sort btn
 let sorted = false;
 btnSort.addEventListener('click', function (e) {
@@ -500,15 +549,37 @@ btnSort.addEventListener('click', function (e) {
 /////////////////////////////////////////////////
 // LECTURES
 
-
 // const num = 3454334353.23;
 
 // const options = {
 //   style: "unit",
 //   unit: "mile-per-hour"
-// } 
+// }
 
 // console.log(new Intl.NumberFormat('en-US', options).format(num));
 // console.log(new Intl.NumberFormat('de-DE', options).format(num));
 // console.log(new Intl.NumberFormat('ar-SY', options).format(num));
 // console.log(new Intl.NumberFormat(navigator.language, options).format(num));
+
+// const ingredients = ['oil']
+
+// const spag = setTimeout((ing1, ing2) => console.log(`Here is your spag with ${ing1} and ${ing2}`), 3000, ...ingredients);
+// console.log('waiting ....')
+
+// if (ingredients.includes('onions')) clearTimeout(spag)
+
+// setInterval(function() {
+//   const now = new Date();
+//   const option = {
+//     hour: 'numeric',
+//     minute: 'numeric',
+//     second: 'numeric'
+
+//     // weekday: 'long',
+//   };
+//   const dea = new Intl.DateTimeFormat(
+//     navigator.locale,
+//     option
+//   ).format(now)
+//   console.log(dea)
+// },5000)
